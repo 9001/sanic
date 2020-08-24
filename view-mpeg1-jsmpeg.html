@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><title>mpeg1-jsmpeg</title><style>
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+</style></head><body>
+<canvas id="video-canvas"></canvas>
+<script type="text/javascript" src="jsmpeg/jsmpeg.min.js"></script>
+<script type="text/javascript">
+
+function play_stream(src_url) {
+	var canvas = document.getElementById('video-canvas');
+	var player = new JSMpeg.Player(src_url, {
+		canvas: canvas,
+		source: JSMpeg.Source.Fetch
+	});
+}
+
+var port = parseInt((window.location.hash+'').substr(1));
+if (isNaN(port)) {
+	port = window.prompt('choose source port:\n8000 = icecast\n3737 = direct', 3737);
+	window.location.hash = port;
+}
+play_stream('http://' + window.location.hostname + ':' + port + '/the.ts');
+
+</script></body></html>
