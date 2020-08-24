@@ -23,7 +23,7 @@ low latency stream generator; need 4 arguments:
    mpeg1b mpeg4 h264b h264va
 
 3 container
-   ts h264
+   ts h264 rtp
 
 4 protocol
    tcp udp file stdout
@@ -49,6 +49,13 @@ exit 1
 	video/mpeg,mpegversion=1 ! )
 
 
+# h264
+[ "$codec" = h264 ] && args+=(
+	x264enc bframes=0 ref=4 byte-stream=1 rc-lookahead=0
+	psy-tune=animation tune=zerolatency
+	quantizer=34 key-int-max=30 pass=qual speed-preset=faster ! )
+
+
 # baseline h264 (broadway)
 [ "$codec" = h264b ] && args+=(
 	x264enc cabac=0 b-adapt=0 bframes=0 ref=4 byte-stream=1
@@ -70,6 +77,11 @@ exit 1
 	mpegtsmux ! )
 
 
+[ "$ctr" = rtp ] && args+=(
+	rtph264pay ! )
+	# aggregate-mode=zero-latency
+
+
 [ "$proto" = stdout ] && args+=(
 	fdsink fd=0
 )
@@ -77,6 +89,10 @@ exit 1
 
 [ "$proto" = tcp ] && args+=(
 	tcpserversink host=0.0.0.0 port=3737 )
+
+
+[ "$proto" = udp ] && args+=(
+	udpsink host=127.0.0.1 port=3737 )
 
 
 {

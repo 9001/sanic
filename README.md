@@ -39,9 +39,17 @@ http://127.0.0.1:8080/view-mpeg1-jsmpeg.html
 while true; do ./enc-ffmpeg.sh x11 mpeg4 ts tcp; sleep 0.2; done
 ffplay -fflags nobuffer -flags low_delay -probesize 32 -sync ext http://127.0.0.1:3737/the.ts
 
-# alternative playback clients for tcp/http/udp
+# stream h264/mpeg4 over rtp (latency ?.??? sec)
+./enc-ffmpeg.sh x11 h264b rtp udp
+
+# alternative playback clients for tcp/http/udp (prefer ffplay)
 mpv --profile=low-latency --fps=30 http://127.0.0.1:3737/the.ts
 ffplay -fflags nobuffer -flags low_delay -probesize 32 -sync ext http://127.0.0.1:3737/the.ts
+
+# and for rtp (prefer mpv > ffplay > gst)
+mpv --profile=low-latency ffmpeg-h264b.sdp
+ffplay -fflags nobuffer -flags low_delay -probesize 32 -sync ext -protocol_whitelist file,crypto,data,rtp,udp ffmpeg-h264b.sdp
+gst-launch-1.0 udpsrc port=3737 caps="application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96" ! rtph264depay ! decodebin ! videoconvert ! autovideosink
 
 # loopback tests (passthrough)
 ffplay -fflags nobuffer -flags low_delay -probesize 32 -sync ext -f x11grab -framerate 60 -s 1024x720 -i :0.0+128,32

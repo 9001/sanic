@@ -26,7 +26,7 @@ low latency stream generator; need 4 arguments:
    h265nv420 h265nv444
 
 3 container
-   ts webm h264
+   ts webm h264 rtp
 
 4 protocol
    tcp udp file ice stdout
@@ -200,6 +200,12 @@ args+=( -color_range $csr
 
 [ "$ctr" = h264 ] && args+=(
    -f h264 )
+
+[ "$ctr" = rtp ] && args+=(
+   -f rtp )
+
+[ "$ctr" = rtp ] && args+=(
+	'rtp://127.0.0.1:3737/' )
 
 [ "$proto" = tcp ] && [ "$ctr" = ts ] && args+=(
 	'tcp://127.0.0.1:3737/?listen=1&tcp_nodelay=1&tcp_mss=188&send_buffer_size=188' )
