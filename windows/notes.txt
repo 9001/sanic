@@ -1,0 +1,2 @@
+    31ms  gdiscreencapsrc x264enc, d3d11h264dec d3d11videosink
+15..31ms  gdiscreencapsrc x264enc, avdec_h264 d3d11videosink
